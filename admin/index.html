@@ -141,6 +141,11 @@
   </div>
 </div>
 
+<div id="loading" class="gate hidden">
+  <div class="modal"><img src="icon-192.png" alt=""><h3>جاري فتح لوحة التحكم...</h3>
+    <p><span class="spin" style="border-color:rgba(91,61,245,.25);border-top-color:#5B3DF5"></span></p></div>
+</div>
+
 <!-- ربط جهاز جديد (يُفتح من رمز QR أو رابط الربط) -->
 <div id="pairing" class="gate hidden">
   <div class="modal">
@@ -220,8 +225,9 @@ function toast(msg, ms = 2800) {
   const t = $("toast"); t.textContent = msg; t.classList.remove("hidden");
   clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.add("hidden"), ms);
 }
-function show(id) { for (const x of ["locked", "pairing", "app"]) $(x).classList.toggle("hidden", x !== id); }
+function show(id) { for (const x of ["locked", "pairing", "loading", "app"]) $(x).classList.toggle("hidden", x !== id); }
 const limitLabel = (m) => (LIMITS.find((l) => l[0] === m) || [0, m + " د"])[1];
+const when = (t) => t ? `<span class="ltr">${esc(t)}</span>` : "—";
 const mins = (m) => m < 60 ? `${m} د` : `${Math.floor(m / 60)} س ${m % 60} د`;
 
 async function api(path, body) {
@@ -382,7 +388,7 @@ async function devices() {
     const res = await api("/devices");
     modal(`<h3>🖥️ الأجهزة المربوطة</h3><p>هذه الأجهزة فقط تستطيع فتح اللوحة. ألغِ أي جهاز لا تعرفه أو فقدته.</p>
       <div>${res.devices.map((d) => `<div class="dev"><div style="flex:1"><b>${esc(d.name)}</b>${d.id === res.me ? ' <span class="pill p-active">هذا الجهاز</span>' : ""}
-        <div class="meta">رُبط: ${esc(d.created_at)} · آخر استخدام: ${esc(d.last_seen)}</div></div>
+        <div class="meta">رُبط: ${when(d.created_at)} · آخر استخدام: ${when(d.last_seen)}</div></div>
         <button class="soft rose" data-id="${esc(d.id)}">إلغاء</button></div>`).join("")}</div>
       <div class="mbtns"><button class="soft" data-x>إغلاق</button></div>`,
       (m, close) => {
@@ -409,7 +415,7 @@ function render() {
     <div class="card req ${r.state === "accepted" ? "acc" : ""}">
       <div class="who"><div class="av">${esc((r.name || "؟").trim().charAt(0))}</div>
         <div style="flex:1"><h3>${esc(r.name)}</h3>
-          <div class="meta">📞 <span class="ltr">${esc(r.phone_display || "—")}</span> · 📱 ${esc(r.device || "—")}<br>🕒 ${esc(r.requested_at || r.created_at || "")}</div></div>
+          <div class="meta">📞 <span class="ltr">${esc(r.phone_display || "—")}</span> · 📱 ${esc(r.device || "—")}<br>🕒 ${when(r.requested_at || r.created_at)}</div></div>
         <span class="pill p-${r.state}">${esc(r.label)}</span></div>
       ${r.dup.length ? `<div class="dup">🔁 رقم مسجّل سابقاً (إعادة تثبيت): ${esc(r.dup.join("، "))}</div>` : ""}
       <div class="actions">
@@ -432,9 +438,9 @@ function render() {
         <div><b>${esc(r.name)}</b> <span class="pill p-${r.state}">${esc(r.label)}</span>
           <div class="meta">📞 <span class="ltr">${esc(r.phone_display || "—")}</span> · 📱 ${esc(r.device || "—")}${r.version ? " · " + esc(r.version) : ""}</div>
           ${r.notes ? `<div class="note">📝 ${esc(r.notes)}</div>` : ""}</div></div></div>
-      <div><div class="k">وقت التفعيل</div><div class="v">${esc(r.activated_at || "—")}</div></div>
+      <div><div class="k">وقت التفعيل</div><div class="v">${when(r.activated_at)}</div></div>
       <div><div class="k">الحد اليومي · اليوم</div><div class="v">${esc(limitLabel(r.limit))} · ${mins(r.today_min)}</div></div>
-      <div><div class="k">الإجمالي · آخر استخدام</div><div class="v">${mins(r.total_min)} · ${esc(r.last_seen || "—")}</div></div>
+      <div><div class="k">الإجمالي · آخر استخدام</div><div class="v">${mins(r.total_min)} · ${when(r.last_seen)}</div></div>
       <div class="rowbtns">
         ${r.phone ? `<button class="ib" title="واتساب" data-a="wa" data-c="${r.code}">💬</button>` : ""}
         <button class="ib" title="ملاحظة" data-a="note" data-c="${r.code}">📝</button>
@@ -500,6 +506,7 @@ async function pairFlow(code) {
       if (!res.ok) throw new Error(j.detail || "تعذر الربط.");
       store.set(j.token);
       history.replaceState(null, "", location.pathname);
+      show("loading");
       toast("تم ربط الجهاز ✓ — يمكنك تثبيت اللوحة كتطبيق من قائمة المتصفح", 6000);
       load();
     } catch (e) { $("pairErr").textContent = "⚠ " + e.message; $("pairBtn").disabled = false; }
@@ -518,7 +525,13 @@ $("chips").onclick = (e) => { const c = e.target.closest(".chip"); if (!c) retur
 const pair = new URLSearchParams(location.hash.slice(1)).get("pair");
 if (pair) pairFlow(pair.replace(/[^A-Za-z0-9]/g, ""));
 else if (!store.get()) show("locked");
-else load();
+else { show("loading"); load(); }
+
+// رابط ربط فُتح واللوحة مفتوحة
+window.addEventListener("hashchange", () => {
+  const p = new URLSearchParams(location.hash.slice(1)).get("pair");
+  if (p) pairFlow(p.replace(/[^A-Za-z0-9]/g, ""));
+});
 
 setInterval(() => { if (document.visibilityState === "visible" && store.get() && !$("app").classList.contains("hidden")) load(true); }, 30000);
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && store.get() && DATA) load(true); });
