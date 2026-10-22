@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.vmr.remover",
+    "sha256_cert_fingerprints": ["33:BB:99:2D:C0:F1:3E:C1:B2:F6:78:06:C9:6A:96:41:9E:13:75:13:78:E9:61:28:E7:76:C1:8C:DB:14:89:A5"]
+  }
+}]
