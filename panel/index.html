@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#5B3DF5">
+<title>لوحة التحكم</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+  :root{
+    --indigo:#5B3DF5; --sky:#0EA5E9; --teal:#10B9A0; --amber:#F59E0B; --rose:#E11D48; --green:#16A34A;
+    --ink:#1E1B3A; --muted:#6B6890; --bg:#F4F3FF; --card:#fff; --line:#E4E1F7;
+    --hero:linear-gradient(135deg,#5B3DF5,#0EA5E9 55%,#10B9A0);
+    --btn:linear-gradient(90deg,#5B3DF5,#0EA5E9);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Segoe UI",Tahoma,"Noto Sans Arabic",system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
+  button{font:inherit;cursor:pointer;border:0}
+  input,select,textarea{font:inherit;color:var(--ink)}
+  .hidden{display:none!important}
+
+  /* ---------- الرأس */
+  .hero{background:var(--hero);color:#fff;border-radius:0 0 34px 34px;padding:22px 20px 26px;position:relative;overflow:hidden}
+  .hero::before,.hero::after{content:"";position:absolute;border-radius:50%;background:rgba(255,255,255,.09)}
+  .hero::before{width:240px;height:240px;top:-90px;right:-70px}
+  .hero::after{width:160px;height:160px;bottom:-70px;left:-40px;background:rgba(255,255,255,.11)}
+  .hero-in{max-width:1180px;margin:0 auto;position:relative;z-index:1}
+  .top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:12px;flex:1;min-width:220px}
+  .brand img{width:52px;height:52px;border-radius:16px;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+  .brand h1{margin:0;font-size:24px;font-weight:800}
+  .brand p{margin:2px 0 0;opacity:.9;font-size:14px}
+  .hbtns{display:flex;gap:8px;flex-wrap:wrap}
+  .hbtn{background:rgba(255,255,255,.18);color:#fff;padding:10px 14px;border-radius:14px;font-weight:600;font-size:14px;
+    backdrop-filter:blur(4px);transition:background .15s}
+  .hbtn:hover{background:rgba(255,255,255,.3)}
+
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:20px}
+  .stat{background:rgba(255,255,255,.17);border-radius:20px;padding:14px 16px}
+  .stat b{display:block;font-size:28px;font-weight:800;line-height:1.2}
+  .stat span{font-size:13px;opacity:.92}
+
+  main{max-width:1180px;margin:0 auto;padding:18px 16px 40px}
+  h2{font-size:18px;margin:18px 4px 12px;display:flex;align-items:center;gap:10px}
+  .badge{width:34px;height:34px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:17px}
+
+  /* ---------- البطاقات */
+  .reqs{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+  .card{background:var(--card);border-radius:22px;padding:16px;box-shadow:0 8px 24px rgba(91,61,245,.10)}
+  .req{border:2px solid #FDE68A;background:linear-gradient(180deg,#FFFBEB,#fff 60%)}
+  .req.acc{border-color:#BAE6FD;background:linear-gradient(180deg,#F0F9FF,#fff 60%)}
+  .who{display:flex;gap:12px;align-items:center}
+  .av{width:46px;height:46px;border-radius:50%;background:var(--hero);color:#fff;font-weight:800;font-size:19px;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .who h3{margin:0;font-size:17px}
+  .meta{color:var(--muted);font-size:13px;margin-top:3px;line-height:1.7}
+  .ltr{direction:ltr;unicode-bidi:isolate;display:inline-block}
+  .dup{margin-top:10px;background:#FEF3C7;color:#92400E;border-radius:12px;padding:8px 10px;font-size:13px}
+  .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .btn{background:var(--btn);color:#fff;padding:10px 16px;border-radius:14px;font-weight:700;box-shadow:0 6px 16px rgba(91,61,245,.25)}
+  .soft{padding:9px 13px;border-radius:12px;font-weight:600;font-size:14px;background:rgba(91,61,245,.10);color:var(--indigo)}
+  .soft.green{background:rgba(22,163,74,.11);color:#15803D}
+  .soft.rose{background:rgba(225,29,72,.10);color:var(--rose)}
+  .soft.amber{background:rgba(245,158,11,.14);color:#B45309}
+  .soft.sky{background:rgba(14,165,233,.12);color:#0369A1}
+  .soft:hover,.btn:hover{filter:brightness(.96)}
+
+  /* ---------- قائمة المستخدمين */
+  .tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+  .search{flex:1;min-width:220px;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:11px 14px;outline:none}
+  .search:focus{border-color:var(--indigo)}
+  .chips{display:flex;gap:6px;flex-wrap:wrap}
+  .chip{background:#fff;border:1.5px solid var(--line);color:var(--ink);padding:8px 14px;border-radius:999px;font-size:14px}
+  .chip.on{background:var(--btn);color:#fff;border-color:transparent;font-weight:700}
+  .list{display:flex;flex-direction:column;gap:10px}
+  .row{background:#fff;border-radius:18px;padding:12px 14px;box-shadow:0 4px 14px rgba(91,61,245,.07);
+    display:grid;grid-template-columns:minmax(190px,1.4fr) 1fr 1fr 1fr auto;gap:12px;align-items:center}
+  .row .k{font-size:12px;color:var(--muted)}
+  .row .v{font-size:14px;margin-top:2px}
+  .pill{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12.5px;font-weight:700}
+  .p-active{background:#DCFCE7;color:#166534}.p-new,.p-waiting{background:#FEF3C7;color:#92400E}
+  .p-accepted{background:#E0F2FE;color:#075985}.p-blocked{background:#FFE4E6;color:#9F1239}.p-inactive{background:#F1F5F9;color:#475569}
+  .note{margin-top:4px;font-size:13px;color:#7C3AED;white-space:pre-wrap}
+  .rowbtns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+  .ib{width:38px;height:38px;border-radius:12px;background:#F4F3FF;font-size:17px;display:inline-flex;align-items:center;justify-content:center}
+  .ib:hover{background:#E9E5FF}
+  .empty{text-align:center;color:var(--muted);padding:30px}
+  @media (max-width:820px){
+    .row{grid-template-columns:1fr 1fr}
+    .row .c-name{grid-column:1/-1}
+    .rowbtns{grid-column:1/-1;justify-content:flex-start}
+    .brand h1{font-size:20px}
+  }
+
+  /* ---------- النوافذ */
+  .ov{position:fixed;inset:0;background:rgba(30,27,58,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}
+  .modal{background:#fff;border-radius:26px;max-width:460px;width:100%;padding:22px;box-shadow:0 30px 70px rgba(0,0,0,.3);
+    max-height:92vh;overflow:auto;animation:pop .18s ease-out}
+  @keyframes pop{from{transform:scale(.92);opacity:0}to{transform:none;opacity:1}}
+  .modal h3{margin:0 0 6px;font-size:19px}
+  .modal p{color:var(--muted);margin:6px 0 12px;line-height:1.7}
+  .f{display:block;margin:10px 0}
+  .f span{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+  .f input,.f select,.f textarea{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:11px 13px;background:#FBFAFF;outline:none}
+  .f input:focus,.f select:focus,.f textarea:focus{border-color:var(--indigo)}
+  .mbtns{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+  .mbtns .btn{flex:1}
+  .qr{display:flex;justify-content:center;margin:10px 0}
+  .qr svg{border-radius:16px;box-shadow:0 6px 20px rgba(0,0,0,.08)}
+  .code{font-family:Consolas,monospace;font-size:20px;letter-spacing:2px;text-align:center;direction:ltr;font-weight:700}
+  .linkbox{direction:ltr;background:#F4F3FF;border-radius:12px;padding:10px;word-break:break-all;font-size:13px}
+  .dev{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+  .dev:last-child{border:0}
+
+  /* ---------- شاشة الدخول/القفل */
+  .gate{min-height:100vh;background:var(--hero);display:flex;align-items:center;justify-content:center;padding:16px}
+  .gate .modal{animation:none;text-align:center}
+  .gate img{width:84px;height:84px;border-radius:24px;margin-bottom:8px}
+
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 18px;
+    border-radius:14px;z-index:60;box-shadow:0 10px 30px rgba(0,0,0,.25);max-width:92vw}
+  .spin{display:inline-block;width:16px;height:16px;border:2.5px solid rgba(255,255,255,.5);border-top-color:#fff;border-radius:50%;
+    animation:sp .8s linear infinite;vertical-align:middle}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  .foot{text-align:center;color:#9a97b8;font-size:12px;margin-top:26px}
+</style>
+</head>
+<body>
+
+<!-- شاشة القفل: لا تكشف أي شيء لمن ليس جهازه مربوطاً -->
+<div id="locked" class="gate hidden">
+  <div class="modal">
+    <img src="icon-192.png" alt="">
+    <h3>هذه اللوحة خاصة</h3>
+    <p>هذا الجهاز غير مربوط.</p>
+  </div>
+</div>
+
+<div id="loading" class="gate hidden">
+  <div class="modal"><img src="icon-192.png" alt=""><h3>جاري فتح لوحة التحكم...</h3>
+    <p><span class="spin" style="border-color:rgba(91,61,245,.25);border-top-color:#5B3DF5"></span></p></div>
+</div>
+
+<!-- ربط جهاز جديد (يُفتح من رمز QR أو رابط الربط) -->
+<div id="pairing" class="gate hidden">
+  <div class="modal">
+    <img src="icon-192.png" alt="">
+    <h3>ربط هذا الجهاز بلوحة التحكم</h3>
+    <p>اكتب اسماً لهذا الجهاز ليظهر في قائمة الأجهزة المربوطة.</p>
+    <label class="f"><span>اسم الجهاز</span><input id="pairName" maxlength="40"></label>
+    <div class="mbtns"><button class="btn" id="pairBtn">ربط الجهاز</button></div>
+    <p id="pairErr" style="color:var(--rose)"></p>
+  </div>
+</div>
+
+<!-- اللوحة -->
+<div id="app" class="hidden">
+  <header class="hero">
+    <div class="hero-in">
+      <div class="top">
+        <div class="brand">
+          <img src="icon-192.png" alt="">
+          <div><h1>لوحة التحكم</h1><p>مُزيل موسيقى الفيديو</p></div>
+        </div>
+        <div class="hbtns">
+          <button class="hbtn" id="bLink">🔗 رابط التطبيق</button>
+          <button class="hbtn" id="bRotate">♻️ تغيير الرابط</button>
+          <button class="hbtn" id="bPair">📱 ربط جهاز</button>
+          <button class="hbtn" id="bDevices">🖥️ الأجهزة</button>
+          <button class="hbtn" id="bRefresh">🔄</button>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat"><b id="sTotal">–</b><span>👥 عدد الأشخاص</span></div>
+        <div class="stat"><b id="sActive">–</b><span>✅ المفعّلون</span></div>
+        <div class="stat"><b id="sReq">–</b><span>🔔 طلبات جديدة</span></div>
+        <div class="stat"><b id="sToday">–</b><span>⏱ دقائق الإزالة اليوم</span></div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="reqSec" class="hidden">
+      <h2><span class="badge" style="background:#FEF3C7">🔔</span> طلبات التفعيل</h2>
+      <div class="reqs" id="reqs"></div>
+    </section>
+
+    <h2><span class="badge" style="background:#E9E5FF">👥</span> المستخدمون</h2>
+    <div class="tools">
+      <input class="search" id="q" placeholder="🔎  بحث بالاسم أو الرقم أو الملاحظة">
+      <div class="chips" id="chips">
+        <button class="chip on" data-f="all">الكل</button>
+        <button class="chip" data-f="active">المفعّلون</button>
+        <button class="chip" data-f="blocked">المحظورون</button>
+      </div>
+    </div>
+    <div class="list" id="list"></div>
+    <div class="foot" id="foot"></div>
+  </main>
+</div>
+
+<div id="modals"></div>
+<div id="toast" class="toast hidden"></div>
+
+<script>
+const API = "https://mypropertiesksa--vmr-separator-panel.us-east.modal.run";
+const SITE = "https://basudan-app.github.io";
+const LIMITS = [[15, "ربع ساعة"], [30, "نصف ساعة"], [60, "ساعة"], [90, "ساعة ونصف"], [120, "ساعتان"]];
+const KEY = "vmr_admin_token";
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const store = {
+  get() { try { return localStorage.getItem(KEY) || ""; } catch { return ""; } },
+  set(v) { try { v ? localStorage.setItem(KEY, v) : localStorage.removeItem(KEY); } catch {} },
+};
+let DATA = null, FILTER = "all", knownReq = null;
+
+function toast(msg, ms = 2800) {
+  const t = $("toast"); t.textContent = msg; t.classList.remove("hidden");
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.add("hidden"), ms);
+}
+function show(id) { for (const x of ["locked", "pairing", "loading", "app"]) $(x).classList.toggle("hidden", x !== id); }
+const limitLabel = (m) => (LIMITS.find((l) => l[0] === m) || [0, m + " د"])[1];
+const when = (t) => t ? `<span class="ltr">${esc(t)}</span>` : "—";
+const mins = (m) => m < 60 ? `${m} د` : `${Math.floor(m / 60)} س ${m % 60} د`;
+
+async function api(path, body) {
+  const res = await fetch(API + path, {
+    method: body === undefined ? "GET" : "POST",
+    headers: {"Content-Type": "application/json", "X-Device-Token": store.get()},
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+  let j = {};
+  try { j = await res.json(); } catch {}
+  if (res.status === 401) { store.set(""); show("locked"); throw new Error("locked"); }
+  if (!res.ok) throw new Error(j.detail || "تعذر الاتصال بالسيرفر.");
+  return j;
+}
+
+// ---------------------------------------------------------------- النوافذ
+function modal(html, onReady) {
+  const ov = document.createElement("div");
+  ov.className = "ov";
+  ov.innerHTML = `<div class="modal">${html}</div>`;
+  ov.addEventListener("click", (e) => { if (e.target === ov) close(); });
+  const close = () => ov.remove();
+  $("modals").appendChild(ov);
+  onReady && onReady(ov.querySelector(".modal"), close);
+  return close;
+}
+function confirmBox(title, text, okText, okClass, onOk) {
+  modal(`<h3>${title}</h3><p>${text}</p>
+    <div class="mbtns"><button class="btn ${okClass || ""}" data-ok>${okText}</button><button class="soft" data-x>إلغاء</button></div>`,
+    (m, close) => {
+      m.querySelector("[data-x]").onclick = close;
+      m.querySelector("[data-ok]").onclick = async (e) => { e.target.disabled = true; await onOk(); close(); };
+    });
+}
+async function op(body, busy) {
+  try { await api("/op", body); toast(busy || "تم ✓"); await load(); }
+  catch (e) { if (e.message !== "locked") toast("⚠ " + e.message, 4500); }
+}
+function copy(text) {
+  if (navigator.clipboard) navigator.clipboard.writeText(text).catch(() => {});
+}
+const wa = (phone, text) => `https://wa.me/${phone}${text ? "?text=" + encodeURIComponent(text) : ""}`;
+function welcome(name, link) {
+  return [`السلام عليكم ${name} 👋`, "", "تم قبول طلبك في تطبيق «مُزيل موسيقى الفيديو» ✅", "",
+          "اضغط هنا لتفعيل التطبيق:", link, "", "— سعيد باسودان"].join("\n");
+}
+
+// ---------------------------------------------------------------- الأوامر
+function acceptReq(r) {
+  const again = r.state === "accepted";
+  modal(`<h3>✅ قبول طلب ${esc(r.name)}</h3>
+    <p>الجوال: <span class="ltr">${esc(r.phone_display)}</span> · ${esc(r.device || "")}<br>
+    تصله رسالة ترحيب على واتساب فيها رابط تفعيل لمرة واحدة؛ لا يتفعّل التطبيق إلا بضغطه من نفس الجوال.</p>
+    ${r.dup.length ? `<div class="dup">🔁 هذا الرقم مسجّل سابقاً باسم: ${esc(r.dup.join("، "))}<br>عند التفعيل يُدمج السطر القديم في الجديد ويُحذف (مع نقل استخدامه).</div>` : ""}
+    <label class="f"><span>الاسم</span><input id="mName" value="${esc(r.name)}" maxlength="40"></label>
+    <label class="f"><span>الحد اليومي للإزالة</span><select id="mLim">${LIMITS.map(([v, l]) =>
+      `<option value="${v}" ${v === r.limit ? "selected" : ""}>${l}</option>`).join("")}</select></label>
+    <div class="mbtns"><button class="btn" data-ok>${again ? "إعادة إرسال رسالة الواتساب" : "قبول وإرسال رسالة واتساب"}</button><button class="soft" data-x>إلغاء</button></div>`,
+    (m, close) => {
+      m.querySelector("[data-x]").onclick = close;
+      m.querySelector("[data-ok]").onclick = async (e) => {
+        const name = m.querySelector("#mName").value.trim() || r.name, limit = +m.querySelector("#mLim").value;
+        e.target.disabled = true; e.target.innerHTML = '<span class="spin"></span>';
+        try {
+          const res = await api("/op", {op: "accept", code: r.code, name, limit});
+          const text = welcome(name, `${SITE}/a/#${res.link_key}`);
+          copy(text);
+          window.open(wa(r.phone, text), "_blank");
+          close(); toast("تم القبول ✓ — اضغط «إرسال» في واتساب"); load();
+        } catch (err) { e.target.disabled = false; e.target.textContent = "حاول مرة أخرى"; if (err.message !== "locked") toast("⚠ " + err.message, 4500); }
+      };
+    });
+}
+function rejectReq(r) {
+  confirmBox("❌ رفض الطلب", `رفض طلب «${esc(r.name)}» (<span class="ltr">${esc(r.phone_display)}</span>)؟<br>يُحذف الطلب، ويستطيع إرسال طلب جديد.`,
+             "رفض", "", () => op({op: "reject", code: r.code}, "تم الرفض"));
+}
+function editLimit(r) {
+  modal(`<h3>⏱ تعديل ${esc(r.name)}</h3>
+    <label class="f"><span>الاسم</span><input id="mName" value="${esc(r.name)}" maxlength="40"></label>
+    <label class="f"><span>الحد اليومي للإزالة</span><select id="mLim">${LIMITS.map(([v, l]) =>
+      `<option value="${v}" ${v === r.limit ? "selected" : ""}>${l}</option>`).join("")}</select></label>
+    <div class="mbtns"><button class="btn" data-ok>حفظ</button><button class="soft" data-x>إلغاء</button></div>`,
+    (m, close) => {
+      m.querySelector("[data-x]").onclick = close;
+      const n = m.querySelector("#mName"), l = m.querySelector("#mLim");
+      m.querySelector("[data-ok]").onclick = async () => { const name = n.value.trim() || r.name, limit = +l.value; close();
+        await op({op: "edit", code: r.code, name, limit}, "تم الحفظ ✓"); };
+    });
+}
+function editNote(r) {
+  modal(`<h3>📝 ملاحظة — ${esc(r.name)}</h3><p>تظهر لك فقط.</p>
+    <label class="f"><textarea rows="5" maxlength="1000">${esc(r.notes)}</textarea></label>
+    <div class="mbtns"><button class="btn" data-ok>حفظ</button><button class="soft" data-x>إلغاء</button></div>`,
+    (m, close) => {
+      const t = m.querySelector("textarea"); t.focus(); t.setSelectionRange(t.value.length, t.value.length);
+      m.querySelector("[data-x]").onclick = close;
+      m.querySelector("[data-ok]").onclick = async () => { const notes = t.value.trim(); close();
+        await op({op: "note", code: r.code, notes}, "تم حفظ الملاحظة ✓"); };
+    });
+}
+function toggleBlock(r) {
+  const b = r.state !== "blocked";
+  confirmBox(b ? "⛔ حظر" : "✅ فك الحظر",
+    b ? `حظر «${esc(r.name)}»؟ يتوقف التطبيق على جواله فوراً.` : `فك الحظر عن «${esc(r.name)}»؟`,
+    b ? "حظر" : "فك الحظر", "", () => op({op: "block", code: r.code, blocked: b}, b ? "تم الحظر" : "تم فك الحظر"));
+}
+function del(r) {
+  confirmBox("🗑 حذف", `حذف «${esc(r.name)}» نهائياً؟ يتوقف التطبيق على جواله ولا يمكن التراجع.`,
+             "حذف نهائياً", "", () => op({op: "delete", code: r.code}, "تم الحذف"));
+}
+
+async function appLink(rotate) {
+  const go = async () => {
+    try {
+      const res = await api("/link", {rotate: !!rotate});
+      const link = `${SITE}/#${res.key}`;
+      copy(link);
+      modal(`<h3>${rotate ? "✅ رابط جديد (أُلغيت الروابط السابقة)" : "🔗 رابط تنزيل التطبيق"}</h3>
+        <p>أرسله لأي شخص جديد. ينزّل دائماً أحدث نسخة. (تم نسخه)</p>
+        <div class="linkbox">${esc(link)}</div>
+        <div class="mbtns"><button class="btn" data-wa>💬 إرسال بالواتساب</button><button class="soft" data-c>📋 نسخ</button><button class="soft" data-x>إغلاق</button></div>`,
+        (m, close) => {
+          m.querySelector("[data-x]").onclick = close;
+          m.querySelector("[data-c]").onclick = () => { copy(link); toast("تم النسخ ✓"); };
+          m.querySelector("[data-wa]").onclick = () => window.open("https://wa.me/?text=" + encodeURIComponent(link), "_blank");
+        });
+    } catch (e) { if (e.message !== "locked") toast("⚠ " + e.message, 4500); }
+  };
+  if (rotate) confirmBox("♻️ تغيير رابط التطبيق", "سيتوقف الرابط الحالي وكل الروابط التي أرسلتها سابقاً. (لا يتأثر من ثبّت التطبيق مسبقاً.)",
+                         "إنشاء رابط جديد", "", go);
+  else go();
+}
+
+async function pairDevice() {
+  try {
+    const res = await api("/pair/start", {});
+    let left = res.minutes * 60;
+    modal(`<h3>📱 ربط جهاز جديد</h3>
+      <p>صوّر الرمز <b>بكاميرا الجوال العادية</b> (ليس بماسح الواتساب)، أو أرسل الرابط لنفسك بالواتساب وافتحه من الجوال. الرمز لمرة واحدة.</p>
+      <div class="qr">${res.qr_svg}</div>
+      <div class="code">${esc(res.code)}</div>
+      <p style="text-align:center" id="pairLeft"></p>
+      <div class="mbtns"><button class="btn" data-wa>💬 إرسال الرابط بالواتساب</button><button class="soft" data-c>📋 نسخ</button><button class="soft" data-x>إغلاق</button></div>`,
+      (m, close) => {
+        m.querySelector("[data-x]").onclick = () => { clearInterval(tm); close(); };
+        m.querySelector("[data-wa]").onclick = () => window.open("https://wa.me/?text=" + encodeURIComponent(res.url), "_blank");
+        m.querySelector("[data-c]").onclick = () => { copy(res.url); toast("تم نسخ رابط الربط ✓"); };
+        const tick = () => { left--; const el = m.querySelector("#pairLeft");
+          if (el) el.textContent = left > 0 ? `ينتهي خلال ${Math.floor(left / 60)}:${String(left % 60).padStart(2, "0")}` : "انتهت صلاحية الرمز";
+          if (left <= 0) clearInterval(tm); };
+        const tm = setInterval(tick, 1000); tick();
+      });
+  } catch (e) { if (e.message !== "locked") toast("⚠ " + e.message, 4500); }
+}
+
+async function devices() {
+  try {
+    const res = await api("/devices");
+    modal(`<h3>🖥️ الأجهزة المربوطة</h3><p>هذه الأجهزة فقط تستطيع فتح اللوحة. ألغِ أي جهاز لا تعرفه أو فقدته.</p>
+      <div>${res.devices.map((d) => `<div class="dev"><div style="flex:1"><b>${esc(d.name)}</b>${d.id === res.me ? ' <span class="pill p-active">هذا الجهاز</span>' : ""}
+        <div class="meta">رُبط: ${when(d.created_at)} · آخر استخدام: ${when(d.last_seen)}</div></div>
+        <button class="soft rose" data-id="${esc(d.id)}">إلغاء</button></div>`).join("")}</div>
+      <div class="mbtns"><button class="soft" data-x>إغلاق</button></div>`,
+      (m, close) => {
+        m.querySelector("[data-x]").onclick = close;
+        m.querySelectorAll("[data-id]").forEach((b) => b.onclick = () => {
+          const me = b.dataset.id === res.me;
+          confirmBox("إلغاء ربط الجهاز", me ? "إلغاء ربط هذا الجهاز نفسه؟ ستُقفل اللوحة عليه فوراً." : "لن يستطيع هذا الجهاز فتح اللوحة بعد الآن.",
+            "إلغاء الربط", "", async () => { await api("/devices/revoke", {id: b.dataset.id}); close(); toast("تم إلغاء الربط"); if (!me) devices(); });
+        });
+      });
+  } catch (e) { if (e.message !== "locked") toast("⚠ " + e.message, 4500); }
+}
+
+// ---------------------------------------------------------------- العرض
+function render() {
+  const d = DATA; if (!d) return;
+  $("sTotal").textContent = d.stats.total; $("sActive").textContent = d.stats.active;
+  $("sReq").textContent = d.stats.requests; $("sToday").textContent = d.stats.today_min;
+
+  const reqs = d.rows.filter((r) => ["new", "waiting", "accepted"].includes(r.state))
+    .sort((a, b) => (a.state === "accepted") - (b.state === "accepted") || (b.requested_at || "").localeCompare(a.requested_at || ""));
+  $("reqSec").classList.toggle("hidden", !reqs.length);
+  $("reqs").innerHTML = reqs.map((r) => `
+    <div class="card req ${r.state === "accepted" ? "acc" : ""}">
+      <div class="who"><div class="av">${esc((r.name || "؟").trim().charAt(0))}</div>
+        <div style="flex:1"><h3>${esc(r.name)}</h3>
+          <div class="meta">📞 <span class="ltr">${esc(r.phone_display || "—")}</span> · 📱 ${esc(r.device || "—")}<br>🕒 ${when(r.requested_at || r.created_at)}</div></div>
+        <span class="pill p-${r.state}">${esc(r.label)}</span></div>
+      ${r.dup.length ? `<div class="dup">🔁 رقم مسجّل سابقاً (إعادة تثبيت): ${esc(r.dup.join("، "))}</div>` : ""}
+      <div class="actions">
+        ${r.state === "waiting" ? `<button class="btn" data-a="approve" data-c="${r.code}">✅ موافقة</button>`
+          : `<button class="btn" data-a="accept" data-c="${r.code}">${r.state === "accepted" ? "📨 إعادة إرسال الرسالة" : "✅ قبول"}</button>`}
+        <button class="soft rose" data-a="reject" data-c="${r.code}">❌ رفض</button>
+        ${r.phone ? `<button class="soft green" data-a="wa" data-c="${r.code}">💬 واتساب</button>` : ""}
+      </div>
+    </div>`).join("");
+
+  const q = $("q").value.trim();
+  let rows = d.rows.filter((r) => !["new", "waiting", "accepted"].includes(r.state));
+  if (FILTER === "active") rows = rows.filter((r) => r.state === "active");
+  if (FILTER === "blocked") rows = rows.filter((r) => r.state === "blocked");
+  if (q) rows = rows.filter((r) => [r.name, r.phone_display, r.notes, r.device].join(" ").includes(q));
+  rows.sort((a, b) => (b.activated_at || b.created_at || "").localeCompare(a.activated_at || a.created_at || ""));
+  $("list").innerHTML = rows.length ? rows.map((r) => `
+    <div class="row">
+      <div class="c-name"><div class="who"><div class="av" style="width:40px;height:40px;font-size:16px">${esc((r.name || "؟").trim().charAt(0))}</div>
+        <div><b>${esc(r.name)}</b> <span class="pill p-${r.state}">${esc(r.label)}</span>
+          <div class="meta">📞 <span class="ltr">${esc(r.phone_display || "—")}</span> · 📱 ${esc(r.device || "—")}${r.version ? " · " + esc(r.version) : ""}</div>
+          ${r.notes ? `<div class="note">📝 ${esc(r.notes)}</div>` : ""}</div></div></div>
+      <div><div class="k">وقت التفعيل</div><div class="v">${when(r.activated_at)}</div></div>
+      <div><div class="k">الحد اليومي · اليوم</div><div class="v">${esc(limitLabel(r.limit))} · ${mins(r.today_min)}</div></div>
+      <div><div class="k">الإجمالي · آخر استخدام</div><div class="v">${mins(r.total_min)} · ${when(r.last_seen)}</div></div>
+      <div class="rowbtns">
+        ${r.phone ? `<button class="ib" title="واتساب" data-a="wa" data-c="${r.code}">💬</button>` : ""}
+        <button class="ib" title="ملاحظة" data-a="note" data-c="${r.code}">📝</button>
+        <button class="ib" title="الاسم والحد اليومي" data-a="limit" data-c="${r.code}">⏱</button>
+        <button class="ib" title="${r.state === "blocked" ? "فك الحظر" : "حظر"}" data-a="block" data-c="${r.code}">${r.state === "blocked" ? "✅" : "⛔"}</button>
+        <button class="ib" title="حذف" data-a="del" data-c="${r.code}">🗑</button>
+      </div>
+    </div>`).join("") : `<div class="empty">لا يوجد مستخدمون${q ? " مطابقون للبحث" : ""}.</div>`;
+  $("foot").textContent = `آخر تحديث: ${new Date().toLocaleTimeString("ar-SA")} · يتحدث تلقائياً كل 30 ثانية · برمجة: سعيد باسودان`;
+}
+
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-a]"); if (!b || !DATA) return;
+  const r = DATA.rows.find((x) => x.code === b.dataset.c); if (!r) return;
+  ({
+    accept: () => acceptReq(r), reject: () => rejectReq(r), note: () => editNote(r), limit: () => editLimit(r),
+    block: () => toggleBlock(r), del: () => del(r), wa: () => window.open(wa(r.phone), "_blank"),
+    approve: () => confirmBox("✅ موافقة", `الموافقة على تشغيل التطبيق لـ «${esc(r.name)}»؟`, "موافقة", "",
+                              () => op({op: "approve", code: r.code}, "تمت الموافقة ✓")),
+  }[b.dataset.a] || (() => {}))();
+});
+
+function beep() {
+  try {
+    const c = new (window.AudioContext || window.webkitAudioContext)();
+    [880, 1175].forEach((f, i) => { const o = c.createOscillator(), g = c.createGain();
+      o.frequency.value = f; o.connect(g); g.connect(c.destination); g.gain.value = .12;
+      o.start(c.currentTime + i * .18); o.stop(c.currentTime + i * .18 + .15); });
+  } catch {}
+}
+
+async function load(quiet) {
+  if (!quiet) $("bRefresh").innerHTML = '<span class="spin"></span>';
+  try {
+    DATA = await api("/data");
+    const reqs = new Set(DATA.rows.filter((r) => ["new", "waiting"].includes(r.state)).map((r) => r.code));
+    if (knownReq) {
+      const fresh = [...reqs].filter((c) => !knownReq.has(c));
+      if (fresh.length) {
+        beep();
+        toast("🔔 طلب تفعيل جديد من: " + fresh.map((c) => DATA.rows.find((r) => r.code === c).name).join("، "), 6000);
+      }
+    }
+    knownReq = reqs;
+    document.title = reqs.size ? `(${reqs.size}) طلبات جديدة — لوحة التحكم` : "لوحة التحكم";
+    render();
+    show("app");
+  } catch (e) { if (e.message !== "locked") toast("⚠ " + e.message, 4500); }
+  finally { $("bRefresh").textContent = "🔄"; }
+}
+
+// ---------------------------------------------------------------- البدء
+async function pairFlow(code) {
+  show("pairing");
+  const ua = navigator.userAgent;
+  $("pairName").value = /Android/i.test(ua) ? "جوالي" : /Windows/i.test(ua) ? "كمبيوتري" : "جهازي";
+  $("pairBtn").onclick = async () => {
+    $("pairBtn").disabled = true; $("pairErr").textContent = "";
+    try {
+      const res = await fetch(API + "/pair/finish", {method: "POST", headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({code, name: $("pairName").value.trim() || "جهاز"})});
+      const j = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(j.detail || "تعذر الربط.");
+      store.set(j.token);
+      history.replaceState(null, "", location.pathname);
+      show("loading");
+      toast("تم ربط الجهاز ✓ — يمكنك تثبيت اللوحة كتطبيق من قائمة المتصفح", 6000);
+      load();
+    } catch (e) { $("pairErr").textContent = "⚠ " + e.message; $("pairBtn").disabled = false; }
+  };
+}
+
+$("bLink").onclick = () => appLink(false);
+$("bRotate").onclick = () => appLink(true);
+$("bPair").onclick = pairDevice;
+$("bDevices").onclick = devices;
+$("bRefresh").onclick = () => load();
+$("q").oninput = render;
+$("chips").onclick = (e) => { const c = e.target.closest(".chip"); if (!c) return;
+  FILTER = c.dataset.f; document.querySelectorAll(".chip").forEach((x) => x.classList.toggle("on", x === c)); render(); };
+
+const pair = new URLSearchParams(location.hash.slice(1)).get("pair");
+if (pair) pairFlow(pair.replace(/[^A-Za-z0-9]/g, ""));
+else if (!store.get()) show("locked");
+else { show("loading"); load(); }
+
+// رابط ربط فُتح واللوحة مفتوحة
+window.addEventListener("hashchange", () => {
+  const p = new URLSearchParams(location.hash.slice(1)).get("pair");
+  if (p) pairFlow(p.replace(/[^A-Za-z0-9]/g, ""));
+});
+
+setInterval(() => { if (document.visibilityState === "visible" && store.get() && !$("app").classList.contains("hidden")) load(true); }, 30000);
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && store.get() && DATA) load(true); });
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+</script>
+</body>
+</html>
