@@ -367,13 +367,14 @@ async function pairDevice() {
     const res = await api("/pair/start", {});
     let left = res.minutes * 60;
     modal(`<h3>📱 ربط جهاز جديد</h3>
-      <p>صوّر الرمز بكاميرا جوالك، أو افتح الرابط على الجهاز الجديد. الرمز لمرة واحدة.</p>
+      <p>صوّر الرمز <b>بكاميرا الجوال العادية</b> (ليس بماسح الواتساب)، أو أرسل الرابط لنفسك بالواتساب وافتحه من الجوال. الرمز لمرة واحدة.</p>
       <div class="qr">${res.qr_svg}</div>
       <div class="code">${esc(res.code)}</div>
       <p style="text-align:center" id="pairLeft"></p>
-      <div class="mbtns"><button class="soft" data-c>📋 نسخ رابط الربط</button><button class="soft" data-x>إغلاق</button></div>`,
+      <div class="mbtns"><button class="btn" data-wa>💬 إرسال الرابط بالواتساب</button><button class="soft" data-c>📋 نسخ</button><button class="soft" data-x>إغلاق</button></div>`,
       (m, close) => {
         m.querySelector("[data-x]").onclick = () => { clearInterval(tm); close(); };
+        m.querySelector("[data-wa]").onclick = () => window.open("https://wa.me/?text=" + encodeURIComponent(res.url), "_blank");
         m.querySelector("[data-c]").onclick = () => { copy(res.url); toast("تم نسخ رابط الربط ✓"); };
         const tick = () => { left--; const el = m.querySelector("#pairLeft");
           if (el) el.textContent = left > 0 ? `ينتهي خلال ${Math.floor(left / 60)}:${String(left % 60).padStart(2, "0")}` : "انتهت صلاحية الرمز";
