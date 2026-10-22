@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<title>تفعيل برنامج الكمبيوتر</title>
+<style>
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;min-height:100vh;
+    background:linear-gradient(135deg,#5B3DF5,#0EA5E9,#10B9A0);display:flex;align-items:center;
+    justify-content:center;padding:16px;box-sizing:border-box}
+  .card{background:#fff;border-radius:28px;max-width:420px;width:100%;padding:28px 22px;text-align:center;
+    box-shadow:0 20px 50px rgba(0,0,0,.2)}
+  h1{margin:8px 0;color:#1E1B3A;font-size:22px}
+  p{color:#6B6890;margin:0}
+</style>
+</head>
+<body>
+<div class="card">
+  <div style="font-size:48px">💻🎉</div>
+  <h1>تفعيل مُزيل موسيقى الفيديو</h1>
+  <p id="msg">جاري فتح صفحة التفعيل...</p>
+</div>
+<script>
+  // يصل هنا رابط التفعيل إن لم يفتح التطبيق مباشرة. المفتاح بعد # لا يُرسل لخوادم GitHub.
+  // صفحة السيرفر تتحقق من الرابط: إن كان صالحاً تفتح برنامج الكمبيوتر وتعرض رمز التفعيل، وإن استُخدم تظهر "انتهت صلاحية هذا الرابط".
+  var key = decodeURIComponent((location.hash || "").slice(1)).replace(/[^A-Za-z0-9_-]/g, "");
+  if (key) {
+    location.replace("https://mypropertiesksa--vmr-separator-dl.us-east.modal.run/p/" + encodeURIComponent(key));
+  } else {
+    document.getElementById("msg").textContent = "رابط التفعيل غير صحيح.";
+  }
+</script>
+</body>
+</html>

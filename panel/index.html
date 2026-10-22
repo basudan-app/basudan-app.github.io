@@ -95,6 +95,9 @@
   .p-accepted{background:#E0F2FE;color:#075985}.p-blocked{background:#FFE4E6;color:#9F1239}.p-inactive{background:#F1F5F9;color:#475569}
   .pen{background:#F4F3FF;border-radius:8px;padding:2px 6px;font-size:13px;vertical-align:middle}
   .pen:hover{background:#E9E5FF}
+  .plat{font-size:16px;letter-spacing:2px;vertical-align:middle}
+  .c-subs{display:flex;flex-direction:column;gap:6px}
+  .sub{font-size:14px;line-height:1.5}.sub .meta{display:block;margin:0 0 0 0;font-size:12px}
   .note{margin-top:4px;font-size:13px;color:#7C3AED;white-space:pre-wrap}
   .rowbtns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
   .ib{width:38px;height:38px;border-radius:12px;background:#F4F3FF;font-size:17px;display:inline-flex;align-items:center;justify-content:center}
@@ -222,6 +225,8 @@
         <button class="chip on" data-f="all">الكل</button>
         <button class="chip" data-f="active">المفعّلون</button>
         <button class="chip" data-f="blocked">المحظورون</button>
+        <button class="chip" data-f="phone">📱 الجوال</button>
+        <button class="chip" data-f="pc">💻 الكمبيوتر</button>
       </div>
     </div>
     <div class="list" id="list"></div>
@@ -295,18 +300,23 @@ function copy(text) {
   if (navigator.clipboard) navigator.clipboard.writeText(text).catch(() => {});
 }
 const wa = (phone, text) => `https://wa.me/${phone}${text ? "?text=" + encodeURIComponent(text) : ""}`;
-function welcome(name, link) {
-  return [`السلام عليكم ${name} 👋`, "", "تم قبول طلبك في تطبيق «مُزيل موسيقى الفيديو» ✅", "",
-          "اضغط هنا لتفعيل التطبيق:", link, "", "— سعيد باسودان"].join("\n");
+function welcome(name, link, pc) {
+  return [`السلام عليكم ${name} 👋`, "", `تم قبول طلبك في ${pc ? "برنامج «مُزيل موسيقى الفيديو» — نسخة الكمبيوتر 💻" : "تطبيق «مُزيل موسيقى الفيديو»"} ✅`, "",
+          pc ? "اضغط هنا من الكمبيوتر لتفعيل البرنامج:" : "اضغط هنا لتفعيل التطبيق:", link, "", "— سعيد باسودان"].join("\n");
 }
+// النسختان: تطبيق الجوال وبرنامج الكمبيوتر (لكل شخص سطر واحد فيه نسخه)
+const PLAT = ["phone", "pc"];
+const PICON = {phone: "📱", pc: "💻"}, PNAME = {phone: "الجوال", pc: "الكمبيوتر"};
+const icons = (p) => PLAT.filter((k) => p.subs[k]).map((k) => PICON[k]).join("");
 
 // ---------------------------------------------------------------- الأوامر
 function acceptReq(r) {
-  const again = r.state === "accepted";
-  modal(`<h3>✅ قبول طلب ${esc(r.name)}</h3>
-    <p>الجوال: <span class="ltr">${esc(r.phone_display)}</span> · ${esc(r.device || "")}<br>
-    تصله رسالة ترحيب على واتساب فيها رابط تفعيل لمرة واحدة؛ لا يتفعّل التطبيق إلا بضغطه من نفس الجوال.</p>
-    ${r.dup.length ? `<div class="dup">🔁 هذا الرقم مسجّل سابقاً باسم: ${esc(r.dup.join("، "))}<br>عند التفعيل يُدمج السطر القديم في الجديد ويُحذف (مع نقل استخدامه).</div>` : ""}
+  const again = r.state === "accepted", pc = r.platform === "pc";
+  modal(`<h3>✅ قبول طلب ${esc(r.name)} ${PICON[r.platform]}</h3>
+    <p>${pc ? "💻 نسخة الكمبيوتر" : "📱 تطبيق الجوال"} · الرقم: <span class="ltr">${esc(r.phone_display)}</span> · ${esc(r.device || "")}<br>
+    تصله رسالة ترحيب على واتساب فيها رابط تفعيل لمرة واحدة؛ ${pc ? "لا يتفعّل البرنامج إلا على نفس الكمبيوتر الذي طلب." : "لا يتفعّل التطبيق إلا بضغطه من نفس الجوال."}</p>
+    ${r.has.length ? `<div class="dup" style="background:#E0F2FE;color:#075985">👤 مشترك حالياً بنسخة ${r.has.map((k) => PICON[k] + " " + PNAME[k]).join(" و")}. الحد اليومي مشترك بين النسختين.</div>` : ""}
+    ${r.dup.length ? `<div class="dup">🔁 هذا الرقم مسجّل سابقاً (${PNAME[r.platform]}) باسم: ${esc(r.dup.join("، "))}<br>عند التفعيل يُدمج السطر القديم في الجديد ويُحذف (مع نقل استخدامه).</div>` : ""}
     <label class="f"><span>الاسم</span><input id="mName" value="${esc(r.name)}" maxlength="40"></label>
     <label class="f"><span>الحد اليومي للإزالة</span><select id="mLim">${LIMITS.map(([v, l]) =>
       `<option value="${v}" ${v === r.limit ? "selected" : ""}>${l}</option>`).join("")}</select></label>
@@ -318,7 +328,7 @@ function acceptReq(r) {
         e.target.disabled = true; e.target.innerHTML = '<span class="spin"></span>';
         try {
           const res = await api("/op", {op: "accept", code: r.code, name, limit});
-          const text = welcome(name, `${SITE}/a/#${res.link_key}`);
+          const text = welcome(name, `${SITE}/${pc ? "p" : "a"}/#${res.link_key}`, pc);
           copy(text);
           window.open(wa(r.phone, text), "_blank");
           close(); toast("تم القبول ✓ — اضغط «إرسال» في واتساب"); load();
@@ -367,15 +377,36 @@ function editNote(r) {
         await op({op: "note", code: r.code, notes}, "تم حفظ الملاحظة ✓"); };
     });
 }
-function toggleBlock(r) {
-  const b = r.state !== "blocked";
-  confirmBox(b ? "⛔ حظر" : "✅ فك الحظر",
-    b ? `حظر «${esc(r.name)}»؟ يتوقف التطبيق على جواله فوراً.` : `فك الحظر عن «${esc(r.name)}»؟`,
-    b ? "حظر" : "فك الحظر", "", () => op({op: "block", code: r.code, blocked: b}, b ? "تم الحظر" : "تم فك الحظر"));
+// الحظر والحذف لكل نسخة على حدة: الجوال فقط، أو الكمبيوتر فقط، أو الاثنين
+const onWhat = (ks) => ks.length > 1 ? "الجوال والكمبيوتر" : (ks[0] === "pc" ? "الكمبيوتر" : "الجوال");
+function choosePlatforms(p, title, text, pick, onPick) {
+  const ks = PLAT.filter((k) => p.subs[k] && pick(p.subs[k]));
+  if (!ks.length) return toast("لا يوجد ما يُطبَّق عليه هذا الأمر.");
+  if (ks.length === 1) return onPick(ks, true);
+  modal(`<h3>${title} — ${esc(p.name)}</h3><p>${text}</p>
+    <div class="mbtns" style="flex-direction:column">
+      ${ks.map((k) => `<button class="soft" data-k="${k}">${PICON[k]} ${PNAME[k]} فقط</button>`).join("")}
+      <button class="btn" data-k="${ks.join(",")}">📱💻 الاثنين معاً</button>
+      <button class="soft" data-x>إلغاء</button></div>`,
+    (m, close) => {
+      m.querySelector("[data-x]").onclick = close;
+      m.querySelectorAll("[data-k]").forEach((b) => b.onclick = () => { close(); onPick(b.dataset.k.split(","), false); });
+    });
 }
-function del(r) {
-  confirmBox("🗑 حذف", `حذف «${esc(r.name)}» نهائياً؟ يتوقف التطبيق على جواله ولا يمكن التراجع.`,
-             "حذف نهائياً", "", () => op({op: "delete", code: r.code}, "تم الحذف"));
+function block(p, b) {
+  choosePlatforms(p, b ? "⛔ حظر" : "✅ فك الحظر", b ? "حظر على أي نسخة؟" : "فك الحظر عن أي نسخة؟",
+    (s) => (s.state === "blocked") !== b, (ks, ask) => {
+      const go = () => op({op: "block", codes: ks.map((k) => p.subs[k].code), blocked: b}, b ? "تم الحظر" : "تم فك الحظر");
+      if (!ask) return go();
+      confirmBox(b ? "⛔ حظر" : "✅ فك الحظر",
+        b ? `حظر «${esc(p.name)}» على ${onWhat(ks)}؟ يتوقف ${ks[0] === "pc" ? "البرنامج" : "التطبيق"} عنده فوراً.`
+          : `فك الحظر عن «${esc(p.name)}» على ${onWhat(ks)}؟`, b ? "حظر" : "فك الحظر", "", go);
+    });
+}
+function del(p) {
+  choosePlatforms(p, "🗑 حذف", "حذف أي نسخة؟ (لا يمكن التراجع)", () => true, (ks) =>
+    confirmBox("🗑 حذف", `حذف «${esc(p.name)}» من ${onWhat(ks)} نهائياً؟ يتوقف عنده ولا يمكن التراجع.`,
+               "حذف نهائياً", "", () => op({op: "delete", codes: ks.map((k) => p.subs[k].code)}, "تم الحذف")));
 }
 
 async function appLink(rotate) {
@@ -472,9 +503,10 @@ function render() {
     <div class="card req ${r.state === "accepted" ? "acc" : ""}">
       <div class="who"><div class="av">${esc((r.name || "؟").trim().charAt(0))}</div>
         <div style="flex:1"><h3>${esc(r.name)}</h3>
-          <div class="meta">📞 <span class="ltr">${esc(r.phone_display || "—")}</span> · 📱 ${esc(r.device || "—")}<br>🕒 ${when(r.requested_at || r.created_at)}</div></div>
+          <div class="meta">${PICON[r.platform]} <b>${r.platform === "pc" ? "نسخة الكمبيوتر" : "تطبيق الجوال"}</b> · ${esc(r.device || "—")}<br>📞 <span class="ltr">${esc(r.phone_display || "—")}</span> · 🕒 ${when(r.requested_at || r.created_at)}</div></div>
         <span class="pill p-${r.state}">${esc(r.label)}</span></div>
-      ${r.dup.length ? `<div class="dup">🔁 رقم مسجّل سابقاً (إعادة تثبيت): ${esc(r.dup.join("، "))}</div>` : ""}
+      ${r.has.length ? `<div class="dup" style="background:#E0F2FE;color:#075985">👤 مشترك حالياً بـ${r.has.map((k) => PICON[k] + " " + PNAME[k]).join(" و")}</div>` : ""}
+      ${r.dup.length ? `<div class="dup">🔁 رقم مسجّل سابقاً على ${PNAME[r.platform]} (إعادة تثبيت): ${esc(r.dup.join("، "))}</div>` : ""}
       <div class="actions">
         ${r.state === "waiting" ? `<button class="btn" data-a="approve" data-c="${r.code}">✅ موافقة</button>`
           : `<button class="btn" data-a="accept" data-c="${r.code}">${r.state === "accepted" ? "📨 إعادة إرسال الرسالة" : "✅ قبول"}</button>`}
@@ -484,38 +516,48 @@ function render() {
     </div>`).join("");
 
   const q = $("q").value.trim();
-  let rows = d.rows.filter((r) => !["new", "waiting", "accepted"].includes(r.state));
-  if (FILTER === "active") rows = rows.filter((r) => r.state === "active");
-  if (FILTER === "blocked") rows = rows.filter((r) => r.state === "blocked");
-  if (q) rows = rows.filter((r) => [r.name, r.phone_display, r.notes, r.device].join(" ").includes(q));
+  // سطر واحد لكل شخص: 📱 = الجوال فقط، 💻 = الكمبيوتر فقط، 📱💻 = الاثنين
+  const subsOf = (p) => PLAT.filter((k) => p.subs[k]).map((k) => p.subs[k]);
+  let rows = d.people;
+  if (FILTER === "active") rows = rows.filter((p) => p.state === "active");
+  if (FILTER === "blocked") rows = rows.filter((p) => subsOf(p).some((s) => s.state === "blocked"));
+  if (FILTER === "phone" || FILTER === "pc") rows = rows.filter((p) => p.subs[FILTER]);
+  if (q) rows = rows.filter((p) => [p.name, p.phone_display, p.notes, ...subsOf(p).map((s) => s.device)].join(" ").includes(q));
   rows.sort((a, b) => (b.activated_at || b.created_at || "").localeCompare(a.activated_at || a.created_at || ""));
-  $("list").innerHTML = rows.length ? rows.map((r) => `
+  $("list").innerHTML = rows.length ? rows.map((p) => {
+    const subs = subsOf(p), anyBlocked = subs.some((s) => s.state === "blocked"), anyOpen = subs.some((s) => s.state !== "blocked");
+    return `
     <div class="row">
-      <div class="c-name"><div class="who"><div class="av" style="width:40px;height:40px;font-size:16px">${esc((r.name || "؟").trim().charAt(0))}</div>
-        <div><b>${esc(r.name)}</b> <button class="pen" title="تغيير الاسم" data-a="rename" data-c="${r.code}">✏️</button> <span class="pill p-${r.state}">${esc(r.label)}</span>
-          <div class="meta">📞 <span class="ltr">${esc(r.phone_display || "—")}</span> · 📱 ${esc(r.device || "—")}${r.version ? " · " + esc(r.version) : ""}</div>
-          ${r.notes ? `<div class="note">📝 ${esc(r.notes)}</div>` : ""}</div></div></div>
-      <div><div class="k">وقت التفعيل</div><div class="v">${when(r.activated_at)}</div></div>
-      <div><div class="k">الحد اليومي · اليوم</div><div class="v">${esc(limitLabel(r.limit))} · ${mins(r.today_min)}</div></div>
-      <div><div class="k">الإجمالي · آخر استخدام</div><div class="v">${mins(r.total_min)} · ${when(r.last_seen)}</div></div>
+      <div class="c-name"><div class="who"><div class="av" style="width:40px;height:40px;font-size:16px">${esc((p.name || "؟").trim().charAt(0))}</div>
+        <div><b>${esc(p.name)}</b> <span class="plat" title="${subs.map((s) => PNAME[s.platform]).join(" و")}">${icons(p)}</span>
+          <button class="pen" title="تغيير الاسم" data-a="rename" data-p="${esc(p.key)}">✏️</button>
+          <div class="meta">📞 <span class="ltr">${esc(p.phone_display || "—")}</span>${p.verified ? " · الرقم مؤكَّد" : ""}</div>
+          ${p.notes ? `<div class="note">📝 ${esc(p.notes)}</div>` : ""}</div></div></div>
+      <div class="c-subs">${subs.map((s) => `<div class="sub">${PICON[s.platform]} <span class="pill p-${s.state}">${esc(s.state === "active" ? "مفعّل" : s.label)}</span>
+        <span class="meta">${esc(s.device || "—")}${s.version ? " · " + esc(s.version) : ""} · ${when(s.activated_at)}</span></div>`).join("")}</div>
+      <div><div class="k">الحد اليومي · اليوم${subs.length > 1 ? " (مشترك)" : ""}</div><div class="v">${esc(limitLabel(p.limit))} · ${mins(p.today_min)}</div></div>
+      <div><div class="k">الإجمالي · آخر استخدام</div><div class="v">${mins(p.total_min)} · ${when(p.last_seen)}</div></div>
       <div class="rowbtns">
-        ${r.phone ? `<button class="ib" title="واتساب" data-a="wa" data-c="${r.code}">💬</button>` : ""}
-        <button class="ib" title="ملاحظة" data-a="note" data-c="${r.code}">📝</button>
-        <button class="ib" title="الاسم والحد اليومي" data-a="limit" data-c="${r.code}">⏱</button>
-        <button class="ib" title="${r.state === "blocked" ? "فك الحظر" : "حظر"}" data-a="block" data-c="${r.code}">${r.state === "blocked" ? "✅" : "⛔"}</button>
-        <button class="ib" title="حذف" data-a="del" data-c="${r.code}">🗑</button>
+        ${p.phone ? `<button class="ib" title="واتساب" data-a="wa" data-p="${esc(p.key)}">💬</button>` : ""}
+        <button class="ib" title="ملاحظة" data-a="note" data-p="${esc(p.key)}">📝</button>
+        <button class="ib" title="الاسم والحد اليومي" data-a="limit" data-p="${esc(p.key)}">⏱</button>
+        ${anyOpen ? `<button class="ib" title="حظر" data-a="block" data-p="${esc(p.key)}">⛔</button>` : ""}
+        ${anyBlocked ? `<button class="ib" title="فك الحظر" data-a="unblock" data-p="${esc(p.key)}">✅</button>` : ""}
+        <button class="ib" title="حذف" data-a="del" data-p="${esc(p.key)}">🗑</button>
       </div>
-    </div>`).join("") : `<div class="empty">لا يوجد مستخدمون${q ? " مطابقون للبحث" : ""}.</div>`;
+    </div>`; }).join("") : `<div class="empty">لا يوجد مستخدمون${q ? " مطابقون للبحث" : ""}.</div>`;
   $("foot").textContent = `آخر تحديث: ${new Date().toLocaleTimeString("ar-SA")} · يتحدث تلقائياً كل 30 ثانية · برمجة: سعيد باسودان`;
 }
 
 document.addEventListener("click", (e) => {
   const b = e.target.closest("[data-a]"); if (!b || !DATA) return;
-  const r = DATA.rows.find((x) => x.code === b.dataset.c); if (!r) return;
+  // بطاقات الطلبات: سطر واحد (data-c). قائمة المستخدمين: الشخص كله (data-p)، وأوامر الاسم والحد والملاحظة تشمل نسختيه.
+  const p = b.dataset.p !== undefined ? DATA.people.find((x) => x.key === b.dataset.p) : null;
+  const r = p ? {...p, code: p.codes[0]} : DATA.rows.find((x) => x.code === b.dataset.c); if (!r) return;
   ({
     accept: () => acceptReq(r), reject: () => rejectReq(r), note: () => editNote(r), limit: () => editLimit(r),
     rename: () => renameUser(r),
-    block: () => toggleBlock(r), del: () => del(r), wa: () => window.open(wa(r.phone), "_blank"),
+    block: () => block(p, true), unblock: () => block(p, false), del: () => del(p), wa: () => window.open(wa(r.phone), "_blank"),
     approve: () => confirmBox("✅ موافقة", `الموافقة على تشغيل التطبيق لـ «${esc(r.name)}»؟`, "موافقة", "",
                               () => op({op: "approve", code: r.code}, "تمت الموافقة ✓")),
   }[b.dataset.a] || (() => {}))();
