@@ -529,6 +529,19 @@ async function load(quiet) {
 
 // ---------------------------------------------------------------- البدء
 async function pairFlow(code) {
+  // جهاز مربوط مسبقاً: لا نضيف ربطاً جديداً (كان يُنشئ سطراً مكرراً في قائمة الأجهزة)
+  if (store.get()) {
+    show("loading");
+    try {
+      await api("/devices");
+      history.replaceState(null, "", location.pathname);
+      toast("هذا الجهاز مربوط مسبقاً ✓", 4000);
+      return load();
+    } catch (e) {
+      if (e.message !== "locked") { toast("⚠ " + e.message, 4500); return show("app"); }
+      // الرمز المحفوظ لم يعد صالحاً (أُلغي ربطه): نكمل الربط من جديد
+    }
+  }
   show("pairing");
   const ua = navigator.userAgent;
   // الربط يُحفظ في مكان فتح اللوحة (التطبيق أو المتصفح)، فنميّزهما بالاسم
