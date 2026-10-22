@@ -85,6 +85,8 @@
   .pill{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12.5px;font-weight:700}
   .p-active{background:#DCFCE7;color:#166534}.p-new,.p-waiting{background:#FEF3C7;color:#92400E}
   .p-accepted{background:#E0F2FE;color:#075985}.p-blocked{background:#FFE4E6;color:#9F1239}.p-inactive{background:#F1F5F9;color:#475569}
+  .pen{background:#F4F3FF;border-radius:8px;padding:2px 6px;font-size:13px;vertical-align:middle}
+  .pen:hover{background:#E9E5FF}
   .note{margin-top:4px;font-size:13px;color:#7C3AED;white-space:pre-wrap}
   .rowbtns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
   .ib{width:38px;height:38px;border-radius:12px;background:#F4F3FF;font-size:17px;display:inline-flex;align-items:center;justify-content:center}
@@ -321,6 +323,19 @@ function editLimit(r) {
         await op({op: "edit", code: r.code, name, limit}, "تم الحفظ ✓"); };
     });
 }
+function renameUser(r) {
+  modal(`<h3>✏️ تغيير الاسم</h3><p>الاسم يظهر لك في اللوحة، ويظهر للمشترك في التطبيق ("أهلاً ...").</p>
+    <label class="f"><input maxlength="40" value="${esc(r.name)}"></label>
+    <div class="mbtns"><button class="btn" data-ok>حفظ</button><button class="soft" data-x>إلغاء</button></div>`,
+    (m, close) => {
+      const inp = m.querySelector("input"); inp.focus(); inp.select();
+      m.querySelector("[data-x]").onclick = close;
+      const save = async () => { const name = inp.value.trim(); if (!name || name === r.name) return close();
+        close(); await op({op: "edit", code: r.code, name, limit: r.limit}, "تم تغيير الاسم ✓"); };
+      m.querySelector("[data-ok]").onclick = save;
+      inp.onkeydown = (e) => { if (e.key === "Enter") save(); };
+    });
+}
 function editNote(r) {
   modal(`<h3>📝 ملاحظة — ${esc(r.name)}</h3><p>تظهر لك فقط.</p>
     <label class="f"><textarea rows="5" maxlength="1000">${esc(r.notes)}</textarea></label>
@@ -454,7 +469,7 @@ function render() {
   $("list").innerHTML = rows.length ? rows.map((r) => `
     <div class="row">
       <div class="c-name"><div class="who"><div class="av" style="width:40px;height:40px;font-size:16px">${esc((r.name || "؟").trim().charAt(0))}</div>
-        <div><b>${esc(r.name)}</b> <span class="pill p-${r.state}">${esc(r.label)}</span>
+        <div><b>${esc(r.name)}</b> <button class="pen" title="تغيير الاسم" data-a="rename" data-c="${r.code}">✏️</button> <span class="pill p-${r.state}">${esc(r.label)}</span>
           <div class="meta">📞 <span class="ltr">${esc(r.phone_display || "—")}</span> · 📱 ${esc(r.device || "—")}${r.version ? " · " + esc(r.version) : ""}</div>
           ${r.notes ? `<div class="note">📝 ${esc(r.notes)}</div>` : ""}</div></div></div>
       <div><div class="k">وقت التفعيل</div><div class="v">${when(r.activated_at)}</div></div>
@@ -476,6 +491,7 @@ document.addEventListener("click", (e) => {
   const r = DATA.rows.find((x) => x.code === b.dataset.c); if (!r) return;
   ({
     accept: () => acceptReq(r), reject: () => rejectReq(r), note: () => editNote(r), limit: () => editLimit(r),
+    rename: () => renameUser(r),
     block: () => toggleBlock(r), del: () => del(r), wa: () => window.open(wa(r.phone), "_blank"),
     approve: () => confirmBox("✅ موافقة", `الموافقة على تشغيل التطبيق لـ «${esc(r.name)}»؟`, "موافقة", "",
                               () => op({op: "approve", code: r.code}, "تمت الموافقة ✓")),
