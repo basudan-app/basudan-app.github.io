@@ -115,6 +115,8 @@
   .qr{display:flex;justify-content:center;margin:10px 0}
   .qr svg{border-radius:16px;box-shadow:0 6px 20px rgba(0,0,0,.08)}
   .code{font-family:Consolas,monospace;font-size:17px;letter-spacing:1px;text-align:center;direction:ltr;font-weight:700}
+  .who-box{background:linear-gradient(90deg,#F59E0B,#F97316);color:#fff;font-size:20px;font-weight:800;
+    text-align:center;border-radius:16px;padding:14px;margin:10px 0 4px}
   .linkbox{direction:ltr;background:#F4F3FF;border-radius:12px;padding:10px;word-break:break-all;font-size:13px}
   .dev{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
   .dev:last-child{border:0}
@@ -173,8 +175,8 @@
           <div><h1>لوحة التحكم</h1><p>مُزيل موسيقى الفيديو</p></div>
         </div>
         <div class="hbtns">
-          <button class="hbtn" id="bLink">🔗 رابط التطبيق</button>
-          <button class="hbtn" id="bRotate">♻️ تغيير الرابط</button>
+          <button class="hbtn" id="bLink">🔗 رابط تنزيل تطبيق (مُزيل موسيقى الفيديو)</button>
+          <button class="hbtn" id="bRotate">♻️ تغيير رابط التنزيل</button>
           <button class="hbtn" id="bPair">📱 ربط جهاز</button>
           <button class="hbtn" id="bDevices">🖥️ الأجهزة</button>
           <button class="hbtn" id="bRefresh">🔄</button>
@@ -364,8 +366,11 @@ async function appLink(rotate) {
       const res = await api("/link", {rotate: !!rotate});
       const link = `${SITE}/#${res.key}`;
       copy(link);
-      modal(`<h3>${rotate ? "✅ رابط جديد (أُلغيت الروابط السابقة)" : "🔗 رابط تنزيل التطبيق"}</h3>
-        <p>أرسله لأي شخص جديد. ينزّل دائماً أحدث نسخة. (تم نسخه)</p>
+      modal(`<h3>${rotate ? "✅ رابط تنزيل جديد (أُلغيت الروابط السابقة)" : "🔗 رابط تنزيل تطبيق (مُزيل موسيقى الفيديو)"}</h3>
+        <div class="who-box">📣 يُرسل للمشتركين الجدد</div>
+        <p>يثبّت به الشخص الجديد تطبيق <b>مُزيل موسيقى الفيديو</b>، ثم يرسل طلب تفعيل يظهر لك هنا.<br>
+        ينزّل دائماً أحدث نسخة. (تم نسخه)<br>
+        <span style="color:#B45309">ليس لربط أجهزتك بلوحة التحكم — لذلك استخدم «📱 ربط جهاز».</span></p>
         <div class="linkbox">${esc(link)}</div>
         <div class="mbtns"><button class="btn" data-wa>💬 إرسال بالواتساب</button><button class="soft" data-c>📋 نسخ</button><button class="soft" data-x>إغلاق</button></div>`,
         (m, close) => {
@@ -375,7 +380,7 @@ async function appLink(rotate) {
         });
     } catch (e) { if (e.message !== "locked") toast("⚠ " + e.message, 4500); }
   };
-  if (rotate) confirmBox("♻️ تغيير رابط التطبيق", "سيتوقف الرابط الحالي وكل الروابط التي أرسلتها سابقاً. (لا يتأثر من ثبّت التطبيق مسبقاً.)",
+  if (rotate) confirmBox("♻️ تغيير رابط تنزيل تطبيق (مُزيل موسيقى الفيديو)", "سيتوقف الرابط الحالي وكل الروابط التي أرسلتها سابقاً. (لا يتأثر من ثبّت التطبيق مسبقاً.)",
                          "إنشاء رابط جديد", "", go);
   else go();
 }
