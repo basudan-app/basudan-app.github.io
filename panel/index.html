@@ -138,6 +138,9 @@
     <img src="icon-192.png" alt="">
     <h3>هذه اللوحة خاصة</h3>
     <p>هذا الجهاز غير مربوط.</p>
+    <label class="f"><span>رمز الربط (إن كان معك)</span>
+      <input id="lockCode" maxlength="12" dir="ltr" style="text-align:center;letter-spacing:3px;text-transform:uppercase" autocomplete="off"></label>
+    <div class="mbtns"><button class="btn" id="lockGo">متابعة</button></div>
   </div>
 </div>
 
@@ -514,6 +517,10 @@ async function pairFlow(code) {
   };
 }
 
+$("lockGo").onclick = () => {
+  const c = $("lockCode").value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+  if (c.length === 8) pairFlow(c); else toast("اكتب رمز الربط المكوّن من 8 أحرف كما يظهر على الجهاز المربوط.", 4000);
+};
 $("bLink").onclick = () => appLink(false);
 $("bRotate").onclick = () => appLink(true);
 $("bPair").onclick = pairDevice;
