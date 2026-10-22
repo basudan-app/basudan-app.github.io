@@ -114,7 +114,7 @@
   .mbtns .btn{flex:1}
   .qr{display:flex;justify-content:center;margin:10px 0}
   .qr svg{border-radius:16px;box-shadow:0 6px 20px rgba(0,0,0,.08)}
-  .code{font-family:Consolas,monospace;font-size:20px;letter-spacing:2px;text-align:center;direction:ltr;font-weight:700}
+  .code{font-family:Consolas,monospace;font-size:17px;letter-spacing:1px;text-align:center;direction:ltr;font-weight:700}
   .linkbox{direction:ltr;background:#F4F3FF;border-radius:12px;padding:10px;word-break:break-all;font-size:13px}
   .dev{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
   .dev:last-child{border:0}
@@ -141,7 +141,7 @@
     <h3>هذه اللوحة خاصة</h3>
     <p>هذا الجهاز غير مربوط.</p>
     <label class="f"><span>رمز الربط (إن كان معك)</span>
-      <input id="lockCode" maxlength="12" dir="ltr" style="text-align:center;letter-spacing:3px;text-transform:uppercase" autocomplete="off"></label>
+      <input id="lockCode" maxlength="30" dir="ltr" placeholder="XXXXX-XXXXX-XXXXX-XXXXX" style="text-align:center;letter-spacing:1px;text-transform:uppercase;font-family:Consolas,monospace" autocomplete="off"></label>
     <div class="mbtns"><button class="btn" id="lockGo">متابعة</button></div>
   </div>
 </div>
@@ -564,9 +564,13 @@ async function pairFlow(code) {
   };
 }
 
+$("lockCode").oninput = (e) => {
+  const raw = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 20);
+  e.target.value = raw.match(/.{1,5}/g)?.join("-") || "";
+};
 $("lockGo").onclick = () => {
   const c = $("lockCode").value.toUpperCase().replace(/[^A-Z0-9]/g, "");
-  if (c.length === 8) pairFlow(c); else toast("اكتب رمز الربط المكوّن من 8 أحرف كما يظهر على الجهاز المربوط.", 4000);
+  if (c.length === 20) pairFlow(c); else toast("اكتب رمز الربط كاملاً (20 حرفاً ورقماً) كما يظهر على الجهاز المربوط.", 4500);
 };
 $("bLink").onclick = () => appLink(false);
 $("bRotate").onclick = () => appLink(true);
