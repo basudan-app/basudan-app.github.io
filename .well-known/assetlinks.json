@@ -1,8 +1,26 @@
-[{
-  "relation": ["delegate_permission/common.handle_all_urls"],
-  "target": {
-    "namespace": "android_app",
-    "package_name": "com.vmr.remover",
-    "sha256_cert_fingerprints": ["33:BB:99:2D:C0:F1:3E:C1:B2:F6:78:06:C9:6A:96:41:9E:13:75:13:78:E9:61:28:E7:76:C1:8C:DB:14:89:A5"]
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.vmr.remover",
+      "sha256_cert_fingerprints": [
+        "33:BB:99:2D:C0:F1:3E:C1:B2:F6:78:06:C9:6A:96:41:9E:13:75:13:78:E9:61:28:E7:76:C1:8C:DB:14:89:A5"
+      ]
+    }
+  },
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.basudan.vmradmin",
+      "sha256_cert_fingerprints": [
+        "51:11:44:DB:A2:3B:45:72:43:12:8E:27:24:6F:B5:DD:A2:90:9E:A8:6B:1B:9D:04:A6:2E:2B:B9:13:C4:D6:DE"
+      ]
+    }
   }
-}]
+]
