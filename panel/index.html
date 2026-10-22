@@ -500,7 +500,10 @@ async function load(quiet) {
 async function pairFlow(code) {
   show("pairing");
   const ua = navigator.userAgent;
-  $("pairName").value = /Android/i.test(ua) ? "جوالي" : /Windows/i.test(ua) ? "كمبيوتري" : "جهازي";
+  // الربط يُحفظ في مكان فتح اللوحة (التطبيق أو المتصفح)، فنميّزهما بالاسم
+  const inApp = /; wv\)/.test(ua);
+  $("pairName").value = /Android/i.test(ua) ? (inApp ? "تطبيق لوحة التحكم — جوالي" : "متصفح الجوال")
+    : /Windows/i.test(ua) ? (matchMedia("(display-mode: standalone)").matches ? "تطبيق الكمبيوتر" : "متصفح الكمبيوتر") : "جهازي";
   $("pairBtn").onclick = async () => {
     $("pairBtn").disabled = true; $("pairErr").textContent = "";
     try {
