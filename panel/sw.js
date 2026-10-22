@@ -1,5 +1,5 @@
 // يحفظ واجهة اللوحة فقط (لتُفتح بسرعة كتطبيق). بيانات المستخدمين لا تُحفظ أبداً، تُجلب من السيرفر كل مرة.
-const CACHE = "vmr-panel-v11";
+const CACHE = "vmr-panel-v12";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", (e) => {

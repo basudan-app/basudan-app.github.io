@@ -41,7 +41,8 @@
   .grp.mine{background:rgba(30,27,58,.22);border-color:rgba(255,255,255,.18)}
   .glabel{font-size:15px;font-weight:800;padding:0 4px}
   #bRefresh{align-self:flex-end}
-  @media (min-width:1100px){.hbtns{flex-wrap:nowrap}.gbtns{flex-wrap:nowrap}.hbtn{white-space:nowrap}}
+  @media (min-width:1100px){.hbtns{flex-wrap:nowrap}.gbtns{flex-wrap:nowrap}.hbtn{white-space:nowrap}
+    .grp.mine{margin-inline-start:70px}}
   .gbtns{display:flex;gap:8px;flex-wrap:wrap}
   .hbtn{background:rgba(255,255,255,.18);color:#fff;padding:10px 14px;border-radius:14px;font-weight:600;font-size:14px;
     backdrop-filter:blur(4px);transition:background .15s}
@@ -185,15 +186,15 @@
           <div class="grp">
             <span class="glabel">👥 تطبيق (مُزيل موسيقى الفيديو)</span>
             <div class="gbtns">
-              <button class="hbtn" id="bLink">🔗 رابط تنزيل التطبيق</button>
+              <button class="hbtn" id="bLink">📱 رابط تنزيل التطبيق</button>
               <button class="hbtn" id="bRotate">♻️ تغيير رابط التنزيل</button>
             </div>
           </div>
           <div class="grp mine">
             <span class="glabel">🔐 تطبيق (لوحة التحكم)</span>
             <div class="gbtns">
-              <button class="hbtn" id="bPair">📱 ربط جهاز جديد (خاص بي)</button>
-              <button class="hbtn" id="bDevices">🖥️ الأجهزة المرتبطة</button>
+              <button class="hbtn" id="bPair">🖥️📱 ربط جهاز جديد (خاص بي)</button>
+              <button class="hbtn" id="bDevices">📱🖥️ الأجهزة المرتبطة</button>
             </div>
           </div>
           <button class="hbtn" id="bRefresh" title="تحديث">🔄</button>
