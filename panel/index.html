@@ -35,7 +35,11 @@
   .brand img{width:52px;height:52px;border-radius:16px;box-shadow:0 6px 18px rgba(0,0,0,.18)}
   .brand h1{margin:0;font-size:24px;font-weight:800}
   .brand p{margin:2px 0 0;opacity:.9;font-size:14px}
-  .hbtns{display:flex;gap:8px;flex-wrap:wrap}
+  .hbtns{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-end}
+  .grp{display:flex;flex-direction:column;gap:6px;padding:8px;border-radius:18px;background:rgba(255,255,255,.08)}
+  .grp.mine{background:rgba(30,27,58,.18)}
+  .glabel{font-size:12px;opacity:.9;font-weight:700;padding:0 4px}
+  .gbtns{display:flex;gap:8px;flex-wrap:wrap}
   .hbtn{background:rgba(255,255,255,.18);color:#fff;padding:10px 14px;border-radius:14px;font-weight:600;font-size:14px;
     backdrop-filter:blur(4px);transition:background .15s}
   .hbtn:hover{background:rgba(255,255,255,.3)}
@@ -175,11 +179,21 @@
           <div><h1>لوحة التحكم</h1><p>مُزيل موسيقى الفيديو</p></div>
         </div>
         <div class="hbtns">
-          <button class="hbtn" id="bLink">🔗 رابط تنزيل تطبيق (مُزيل موسيقى الفيديو)</button>
-          <button class="hbtn" id="bRotate">♻️ تغيير رابط التنزيل</button>
-          <button class="hbtn" id="bPair">📱 ربط جهاز</button>
-          <button class="hbtn" id="bDevices">🖥️ الأجهزة</button>
-          <button class="hbtn" id="bRefresh">🔄</button>
+          <div class="grp">
+            <span class="glabel">👥 للمشتركين الجدد</span>
+            <div class="gbtns">
+              <button class="hbtn" id="bLink">🔗 رابط تنزيل تطبيق (مُزيل موسيقى الفيديو)</button>
+              <button class="hbtn" id="bRotate">♻️ تغيير رابط التنزيل</button>
+            </div>
+          </div>
+          <div class="grp mine">
+            <span class="glabel">🔐 أجهزتي (خاص بي)</span>
+            <div class="gbtns">
+              <button class="hbtn" id="bPair">📱 ربط جهاز جديد (خاص بي)</button>
+              <button class="hbtn" id="bDevices">🖥️ الأجهزة المرتبطة بلوحة التحكم</button>
+            </div>
+          </div>
+          <button class="hbtn" id="bRefresh" title="تحديث">🔄</button>
         </div>
       </div>
       <div class="stats">
@@ -389,7 +403,7 @@ async function pairDevice() {
   try {
     const res = await api("/pair/start", {});
     let left = res.minutes * 60;
-    modal(`<h3>📱 ربط جهاز جديد</h3>
+    modal(`<h3>📱 ربط جهاز جديد (خاص بي)</h3>
       <p>صوّر الرمز <b>بكاميرا الجوال العادية</b> (ليس بماسح الواتساب)، أو أرسل الرابط لنفسك بالواتساب وافتحه من الجوال. الرمز لمرة واحدة.</p>
       <div class="qr">${res.qr_svg}</div>
       <div class="code">${esc(res.code)}</div>
@@ -410,7 +424,7 @@ async function pairDevice() {
 async function devices() {
   try {
     const res = await api("/devices");
-    modal(`<h3>🖥️ الأجهزة المربوطة</h3><p>هذه الأجهزة فقط تستطيع فتح اللوحة. ألغِ أي جهاز لا تعرفه أو فقدته.</p>
+    modal(`<h3>🖥️ الأجهزة المرتبطة بلوحة التحكم</h3><p>هذه الأجهزة فقط تستطيع فتح اللوحة. ألغِ أي جهاز لا تعرفه أو فقدته.</p>
       <div>${res.devices.map((d) => `<div class="dev"><div style="flex:1"><b>${esc(d.name)}</b>${d.id === res.me ? ' <span class="pill p-active">هذا الجهاز</span>' : ""}
         <div class="meta">رُبط: ${when(d.created_at)} · آخر استخدام: ${when(d.last_seen)}</div></div>
         <button class="soft" data-rn="${esc(d.id)}" data-name="${esc(d.name)}">✏️ تسمية</button>
