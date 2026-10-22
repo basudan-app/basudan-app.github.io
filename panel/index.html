@@ -189,7 +189,8 @@
           <div class="grp">
             <span class="glabel">👥 تطبيق (مُزيل موسيقى الفيديو)</span>
             <div class="gbtns">
-              <button class="hbtn" id="bLink">📱 رابط تنزيل التطبيق</button>
+              <button class="hbtn" id="bLink">📱 رابط تنزيل تطبيق الجوال</button>
+              <button class="hbtn" id="bLinkPc">💻 رابط تنزيل نسخة الكمبيوتر</button>
               <button class="hbtn" id="bRotate">♻️ تغيير رابط التنزيل</button>
             </div>
           </div>
@@ -409,15 +410,16 @@ function del(p) {
                "حذف نهائياً", "", () => op({op: "delete", codes: ks.map((k) => p.subs[k].code)}, "تم الحذف")));
 }
 
-async function appLink(rotate) {
+async function appLink(rotate, pc) {
   const go = async () => {
     try {
       const res = await api("/link", {rotate: !!rotate});
-      const link = `${SITE}/#${res.key}`;
+      const link = pc ? `${SITE}/pc/#${res.key}` : `${SITE}/#${res.key}`;
       copy(link);
-      modal(`<h3>${rotate ? "✅ رابط تنزيل جديد (أُلغيت الروابط السابقة)" : "🔗 رابط تنزيل تطبيق (مُزيل موسيقى الفيديو)"}</h3>
+      modal(`<h3>${rotate ? "✅ رابط تنزيل جديد (أُلغيت الروابط السابقة)" : pc ? "💻 رابط تنزيل نسخة الكمبيوتر" : "📱 رابط تنزيل تطبيق الجوال"}</h3>
         <div class="who-box">📣 يُرسل للمشتركين الجدد</div>
-        <p>يثبّت به الشخص الجديد تطبيق <b>مُزيل موسيقى الفيديو</b>، ثم يرسل طلب تفعيل يظهر لك هنا.<br>
+        <p>${pc ? "ينزّل به الشخص ملف تثبيت <b>مُزيل موسيقى الفيديو</b> لكمبيوتر ويندوز، ثم يرسل من البرنامج طلب تفعيل يظهر لك هنا بعلامة 💻."
+               : "يثبّت به الشخص الجديد تطبيق <b>مُزيل موسيقى الفيديو</b> على جواله، ثم يرسل طلب تفعيل يظهر لك هنا."}<br>
         ينزّل دائماً أحدث نسخة. (تم نسخه)<br>
         <span style="color:#B45309">ليس لربط أجهزتك بلوحة التحكم — لذلك استخدم «📱 ربط جهاز».</span></p>
         <div class="linkbox">${esc(link)}</div>
@@ -429,7 +431,7 @@ async function appLink(rotate) {
         });
     } catch (e) { if (e.message !== "locked") toast("⚠ " + e.message, 4500); }
   };
-  if (rotate) confirmBox("♻️ تغيير رابط تنزيل تطبيق (مُزيل موسيقى الفيديو)", "سيتوقف الرابط الحالي وكل الروابط التي أرسلتها سابقاً. (لا يتأثر من ثبّت التطبيق مسبقاً.)",
+  if (rotate) confirmBox("♻️ تغيير رابط تنزيل تطبيق (مُزيل موسيقى الفيديو)", "سيتوقف الرابط الحالي وكل الروابط التي أرسلتها سابقاً، للجوال والكمبيوتر معاً. (لا يتأثر من ثبّت التطبيق مسبقاً.)",
                          "إنشاء رابط جديد", "", go);
   else go();
 }
@@ -638,6 +640,7 @@ $("lockGo").onclick = () => {
   if (c.length === 20) pairFlow(c); else toast("اكتب رمز الربط كاملاً (20 حرفاً ورقماً) كما يظهر على الجهاز المربوط.", 4500);
 };
 $("bLink").onclick = () => appLink(false);
+$("bLinkPc").onclick = () => appLink(false, true);
 $("bRotate").onclick = () => appLink(true);
 $("bPair").onclick = pairDevice;
 $("bDevices").onclick = devices;
