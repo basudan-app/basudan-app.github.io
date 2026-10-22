@@ -393,10 +393,25 @@ async function devices() {
     modal(`<h3>🖥️ الأجهزة المربوطة</h3><p>هذه الأجهزة فقط تستطيع فتح اللوحة. ألغِ أي جهاز لا تعرفه أو فقدته.</p>
       <div>${res.devices.map((d) => `<div class="dev"><div style="flex:1"><b>${esc(d.name)}</b>${d.id === res.me ? ' <span class="pill p-active">هذا الجهاز</span>' : ""}
         <div class="meta">رُبط: ${when(d.created_at)} · آخر استخدام: ${when(d.last_seen)}</div></div>
+        <button class="soft" data-rn="${esc(d.id)}" data-name="${esc(d.name)}">✏️ تسمية</button>
         <button class="soft rose" data-id="${esc(d.id)}">إلغاء</button></div>`).join("")}</div>
       <div class="mbtns"><button class="soft" data-x>إغلاق</button></div>`,
       (m, close) => {
         m.querySelector("[data-x]").onclick = close;
+        m.querySelectorAll("[data-rn]").forEach((b) => b.onclick = () => {
+          modal(`<h3>✏️ اسم الجهاز</h3><p>مثل: جوالي، كمبيوتر المنزل، كمبيوتر المكتب.</p>
+            <label class="f"><input maxlength="40" value="${esc(b.dataset.name)}"></label>
+            <div class="mbtns"><button class="btn" data-ok>حفظ</button><button class="soft" data-x>إلغاء</button></div>`,
+            (m2, close2) => {
+              const inp = m2.querySelector("input"); inp.focus(); inp.select();
+              m2.querySelector("[data-x]").onclick = close2;
+              m2.querySelector("[data-ok]").onclick = async () => {
+                const name = inp.value.trim(); if (!name) return;
+                try { await api("/devices/rename", {id: b.dataset.rn, name}); close2(); close(); toast("تم الحفظ ✓"); devices(); }
+                catch (e) { if (e.message !== "locked") toast("⚠ " + e.message, 4500); }
+              };
+            });
+        });
         m.querySelectorAll("[data-id]").forEach((b) => b.onclick = () => {
           const me = b.dataset.id === res.me;
           confirmBox("إلغاء ربط الجهاز", me ? "إلغاء ربط هذا الجهاز نفسه؟ ستُقفل اللوحة عليه فوراً." : "لن يستطيع هذا الجهاز فتح اللوحة بعد الآن.",
